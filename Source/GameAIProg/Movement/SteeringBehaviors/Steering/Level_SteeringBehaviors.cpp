@@ -321,5 +321,21 @@ void ALevel_SteeringBehaviors::DrawTargetSteeringInfo(ImGui_Agent& Agent)
 		1.f,
 		AngularVelocityColor
 	);
+
+	DrawDebugCircle
+	(
+		Agent.Agent->GetWorld(),
+		FVector(Agent.Agent->GetPosition(), 1.f),
+		50.f,
+		20,
+		LinearVelocityColor,
+		false,
+		-1.f,
+		0U,
+		4.f,
+		FVector(1.f, 0.f, 0.f),
+		FVector(0.f, 1.f, 0.f),
+		false
+	);
 }
 
