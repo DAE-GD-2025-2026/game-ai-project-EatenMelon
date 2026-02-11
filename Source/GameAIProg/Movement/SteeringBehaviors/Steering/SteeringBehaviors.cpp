@@ -4,3 +4,14 @@
 //SEEK
 //*******
 // TODO: Do the Week01 assignment :^)
+
+SteeringOutput Seek::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
+{
+	SteeringOutput Steering{};
+
+	Steering.LinearVelocity = Target.Position - Agent.GetPosition();
+	//FVector example{ Target.Position, 0.f };
+	//Agent.GetWorld()
+
+	return Steering;
+}
