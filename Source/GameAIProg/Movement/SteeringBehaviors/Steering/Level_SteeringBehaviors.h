@@ -63,4 +63,6 @@ private:
 	void RefreshTargetLabels();
 	void UpdateTarget(ImGui_Agent& Agent);
 	void RefreshAgentTargets(unsigned int IndexRemoved);
+
+	void DrawTargetSteeringInfo(ImGui_Agent& Agent);
 };

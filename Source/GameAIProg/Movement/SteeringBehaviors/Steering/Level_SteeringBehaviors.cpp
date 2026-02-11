@@ -185,6 +185,11 @@ void ALevel_SteeringBehaviors::Tick(float DeltaTime)
 		if (a.Agent)
 		{
 			UpdateTarget(a);
+
+			if (a.Agent->GetDebugRenderingEnabled())
+			{
+				DrawTargetSteeringInfo(a);
+			}
 		}
 	}
 }
@@ -231,10 +236,13 @@ void ALevel_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& Agent)
 		Agent.Behavior = std::make_unique<Seek>();
 		break;
 
+	case BehaviorTypes::Flee:
+		Agent.Behavior = std::make_unique<Flee>();
+		break;
+
 	default:
 		assert(false); // Incorrect Agent Behavior gotten during SetAgentBehavior()	
 	} 
-	
 
 	UpdateTarget(Agent);
 	
@@ -288,5 +296,30 @@ void ALevel_SteeringBehaviors::RefreshAgentTargets(unsigned int IndexRemoved)
 			}
 		}
 	}
+}
+
+void ALevel_SteeringBehaviors::DrawTargetSteeringInfo(ImGui_Agent& Agent)
+{
+	constexpr float shrink{ 3.f };						// the lines where to long
+	constexpr FColor LinearVelocityColor{ 255, 0, 0 };
+	constexpr FColor AngularVelocityColor{ 0, 0, 255 };
+
+	DrawDebugDirectionalArrow
+	(
+		Agent.Agent->GetWorld(),
+		FVector(Agent.Agent->GetPosition(), 0.f),
+		FVector(Agent.Agent->GetPosition() + Agent.Agent->GetLinearVelocity() / shrink, 0.f),
+		1.f,
+		LinearVelocityColor
+	);
+
+	DrawDebugDirectionalArrow
+	(
+		Agent.Agent->GetWorld(),
+		FVector(Agent.Agent->GetPosition(), 0.f),
+		FVector(Agent.Agent->GetPosition() + Agent.Agent->GetAngularVelocity() / shrink, 0.f),
+		1.f,
+		AngularVelocityColor
+	);
 }
 
