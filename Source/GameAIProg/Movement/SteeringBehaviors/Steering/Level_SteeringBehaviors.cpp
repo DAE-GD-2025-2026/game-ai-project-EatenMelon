@@ -228,7 +228,6 @@ void ALevel_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& Agent)
 {
 	Agent.Behavior.reset();
 	
-	
 	switch (static_cast<BehaviorTypes>(Agent.SelectedBehavior))
 	{
 	//TODO; Implement behaviors setting here
@@ -240,9 +239,16 @@ void ALevel_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& Agent)
 		Agent.Behavior = std::make_unique<Flee>();
 		break;
 
+	case BehaviorTypes::Arrive:
+		Agent.Behavior = std::make_unique<Arrive>();
+		break;
+
 	default:
 		assert(false); // Incorrect Agent Behavior gotten during SetAgentBehavior()	
-	} 
+	}
+
+	//
+	Agent.Behavior->SetMaxSpeed(Agent.Agent->GetMaxLinearSpeed());
 
 	UpdateTarget(Agent);
 	
@@ -301,8 +307,12 @@ void ALevel_SteeringBehaviors::RefreshAgentTargets(unsigned int IndexRemoved)
 void ALevel_SteeringBehaviors::DrawTargetSteeringInfo(ImGui_Agent& Agent)
 {
 	constexpr float shrink{ 3.f };						// the lines where to long
-	constexpr FColor LinearVelocityColor{ 255, 0, 0 };
-	constexpr FColor AngularVelocityColor{ 0, 0, 255 };
+
+	// colors
+	constexpr FColor LinearVelocityColor{ 255, 100, 0 };
+	constexpr FColor AngularVelocityColor{ 100, 100, 255 };
+	constexpr FColor SlowRadiusColor{ 0, 0, 255 };
+	constexpr FColor TargetRadiusColor{ 255, 0, 0 };
 
 	DrawDebugDirectionalArrow
 	(
@@ -322,20 +332,45 @@ void ALevel_SteeringBehaviors::DrawTargetSteeringInfo(ImGui_Agent& Agent)
 		AngularVelocityColor
 	);
 
-	DrawDebugCircle
-	(
-		Agent.Agent->GetWorld(),
-		FVector(Agent.Agent->GetPosition(), 1.f),
-		50.f,
-		20,
-		LinearVelocityColor,
-		false,
-		-1.f,
-		0U,
-		4.f,
-		FVector(1.f, 0.f, 0.f),
-		FVector(0.f, 1.f, 0.f),
-		false
-	);
+	switch (static_cast<BehaviorTypes>(Agent.SelectedBehavior))
+	{
+	case BehaviorTypes::Arrive:
+
+		DrawDebugCircle
+		(
+			Agent.Agent->GetWorld(),
+			FVector(Agent.Agent->GetPosition(), 1.f),
+			Agent.Behavior->GetSlowRadius(),
+			20,
+			SlowRadiusColor,
+			false,
+			-1.f,
+			0U,
+			4.f,
+			FVector(1.f, 0.f, 0.f),
+			FVector(0.f, 1.f, 0.f),
+			false
+		);
+
+		DrawDebugCircle
+		(
+			Agent.Agent->GetWorld(),
+			FVector(Agent.Agent->GetPosition(), 1.f),
+			Agent.Behavior->GetTargetRadius(),
+			20,
+			TargetRadiusColor,
+			false,
+			-1.f,
+			0U,
+			4.f,
+			FVector(1.f, 0.f, 0.f),
+			FVector(0.f, 1.f, 0.f),
+			false
+		);
+
+		break;
+	}
+
+	
 }
 
