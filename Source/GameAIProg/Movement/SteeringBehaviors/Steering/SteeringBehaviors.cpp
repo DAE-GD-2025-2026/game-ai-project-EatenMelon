@@ -19,6 +19,8 @@ float ISteeringBehavior::GetTargetRadius() const
 
 SteeringOutput Seek::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
+	Agent.SetIsAutoOrienting(true);
+
 	SteeringOutput Steering{};
 
 	Steering.LinearVelocity = (Target.Position - Agent.GetPosition()).GetSafeNormal();
@@ -60,6 +62,8 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 
 SteeringOutput Face::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
+	Agent.SetIsAutoOrienting(false);
+
 	SteeringOutput Steering{};
 
 	// Direction to target (normalized!)
