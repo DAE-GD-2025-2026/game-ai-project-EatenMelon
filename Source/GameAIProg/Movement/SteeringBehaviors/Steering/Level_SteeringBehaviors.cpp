@@ -247,9 +247,19 @@ void ALevel_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& Agent)
 		Agent.Behavior = std::make_unique<Face>();
 		break;
 
+	case BehaviorTypes::Pursuit:
+		Agent.Behavior = std::make_unique<Pursuit>();
+		break;
+
+	case BehaviorTypes::Evade:
+		Agent.Behavior = std::make_unique<Evade>();
+		break;
+
 	default:
 		assert(false); // Incorrect Agent Behavior gotten during SetAgentBehavior()	
 	}
+
+	Agent.Behavior->SetMaxSpeed(Agent.Agent->GetMaxLinearSpeed());
 
 	UpdateTarget(Agent);
 	
@@ -323,15 +333,6 @@ void ALevel_SteeringBehaviors::DrawTargetSteeringInfo(ImGui_Agent& Agent)
 		1.f,
 		LinearVelocityColor
 	);
-
-	//DrawDebugDirectionalArrow
-	//(
-	//	Agent.Agent->GetWorld(),
-	//	FVector(Agent.Agent->GetPosition(), 0.f),
-	//	FVector(Agent.Agent->GetPosition() + Agent.Agent->GetAngularVelocity() / shrink, 0.f),
-	//	1.f,
-	//	AngularVelocityColor
-	//);
 
 	switch (static_cast<BehaviorTypes>(Agent.SelectedBehavior))
 	{

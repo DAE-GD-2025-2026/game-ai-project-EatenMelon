@@ -60,3 +60,18 @@ class Face : public ISteeringBehavior
 public:
 	SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent& Agent) override;
 };
+
+class Pursuit : public ISteeringBehavior
+{
+public:
+	SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent& Agent) override;
+
+protected:
+	FVector2D GetTargetFuturePos(ASteeringAgent& Agent) const;
+};
+
+class Evade : public Pursuit
+{
+public:
+	SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent& Agent) override;
+};
