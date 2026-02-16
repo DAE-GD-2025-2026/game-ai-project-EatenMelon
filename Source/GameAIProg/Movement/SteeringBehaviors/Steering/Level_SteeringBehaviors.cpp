@@ -255,6 +255,10 @@ void ALevel_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& Agent)
 		Agent.Behavior = std::make_unique<Evade>();
 		break;
 
+	case BehaviorTypes::Wander:
+		Agent.Behavior = std::make_unique<Wander>();
+		break;
+
 	default:
 		assert(false); // Incorrect Agent Behavior gotten during SetAgentBehavior()	
 	}
@@ -320,7 +324,7 @@ void ALevel_SteeringBehaviors::DrawTargetSteeringInfo(ImGui_Agent& Agent)
 	constexpr float shrink{ 3.f };						// the lines where to long
 
 	// colors
-	constexpr FColor LinearVelocityColor{ 255, 100, 0 };
+	constexpr FColor LinearVelocityColor{ 255, 100, 100 };
 	constexpr FColor AngularVelocityColor{ 100, 100, 255 };
 	constexpr FColor SlowRadiusColor{ 0, 0, 255 };
 	constexpr FColor TargetRadiusColor{ 255, 0, 0 };
@@ -337,6 +341,7 @@ void ALevel_SteeringBehaviors::DrawTargetSteeringInfo(ImGui_Agent& Agent)
 	switch (static_cast<BehaviorTypes>(Agent.SelectedBehavior))
 	{
 	case BehaviorTypes::Arrive:
+	{
 
 		DrawDebugCircle
 		(
@@ -369,7 +374,49 @@ void ALevel_SteeringBehaviors::DrawTargetSteeringInfo(ImGui_Agent& Agent)
 			FVector(0.f, 1.f, 0.f),
 			false
 		);
+	}
+		break;
 
+	case BehaviorTypes::Wander:
+	{
+		FVector center = Agent.Agent->GetActorLocation();
+
+		const auto& behavior = static_cast<Wander*>(Agent.Behavior.get());
+
+		FVector forward = Agent.Agent->GetActorForwardVector();
+
+		forward.Z = 0.f;
+		forward.Normalize();
+
+		center += forward * behavior->GetWanderOffset();
+
+		center.Z = 0.f;
+
+		DrawDebugDirectionalArrow
+		(
+			Agent.Agent->GetWorld(),
+			FVector(Agent.Agent->GetPosition(), 0.f),
+			center,
+			1.f,
+			LinearVelocityColor
+		);
+
+		DrawDebugCircle
+		(
+			Agent.Agent->GetWorld(),
+			center,
+			behavior->GetWanderRadius(),
+			20,
+			TargetRadiusColor,
+			false,
+			-1.f,
+			0U,
+			4.f,
+			FVector(1.f, 0.f, 0.f),
+			FVector(0.f, 1.f, 0.f),
+			false
+		);
+	}
 		break;
 	}
 

@@ -47,6 +47,7 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	const float targetRadiusSq = TargetRadius * TargetRadius;
 	const float distanceSq = FVector2D::DistSquared(Agent.GetPosition(), Target.Position);
 
+	// act based of the ranges
 	if (distanceSq <= targetRadiusSq)
 	{
 		Agent.SetMaxLinearSpeed(0.f);
@@ -68,8 +69,6 @@ SteeringOutput Face::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 
 	// Direction to target
 	const FVector2D DesiredDir = (Target.Position - Agent.GetPosition()).GetSafeNormal();
-
-	// Current forward
 	const FVector Forward = Agent.GetActorForwardVector();
 
 	// Signed angle between them
@@ -114,6 +113,7 @@ SteeringOutput Pursuit::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 
 	const float distToTarget = (Target.Position - Agent.GetPosition()).SizeSquared();
 
+	// avoids the spinning
 	if (distToTarget < margin * margin)
 	{
 		Steering.LinearVelocity = FVector2D::Zero();
@@ -150,6 +150,33 @@ SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 
 	const FVector forward = Agent.GetActorForwardVector();
 	Steering.LinearVelocity = FVector2D(forward.X, forward.Y);
+
+	return Steering;
+}
+
+SteeringOutput Wander::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
+{
+	// get a random angle within a range
+	const float minAngle{ m_WanderAngle - m_MaxAngleChange };
+	const float maxAngle{ m_WanderAngle + m_MaxAngleChange };
+
+	float randomAngle = FMath::FRandRange(0.f, PI * 2);
+	randomAngle = FMath::Clamp(randomAngle, minAngle, maxAngle);
+
+	// use the angle for the new target position
+	FVector2D targetPos = FVector2D(cosf(randomAngle), sinf(randomAngle));
+
+	const FVector forward = Agent.GetActorForwardVector();
+
+	targetPos *= m_Radius;
+	targetPos += FVector2D(forward.X, forward.Y) * m_OffsetDistance;
+
+	// seek towards the new target position
+	Target.Position = targetPos;
+
+	SteeringOutput Steering{ Seek::CalculateSteering(DeltaT, Agent) };
+
+	m_WanderAngle = randomAngle;
 
 	return Steering;
 }
