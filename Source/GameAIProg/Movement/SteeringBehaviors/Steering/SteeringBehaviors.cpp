@@ -139,5 +139,17 @@ FVector2D Pursuit::GetTargetFuturePos(ASteeringAgent& Agent) const
 
 SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
-	return SteeringOutput();
+	FVector2D awayDir = (Agent.GetPosition() - Target.Position).GetSafeNormal();
+
+	Face faceOutput;
+
+	Target.Position = Agent.GetPosition() + awayDir;
+	faceOutput.SetTarget(Target);
+
+	SteeringOutput Steering = faceOutput.CalculateSteering(DeltaT, Agent);
+
+	const FVector forward = Agent.GetActorForwardVector();
+	Steering.LinearVelocity = FVector2D(forward.X, forward.Y);
+
+	return Steering;
 }
