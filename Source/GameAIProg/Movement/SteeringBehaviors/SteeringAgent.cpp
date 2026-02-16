@@ -14,6 +14,8 @@ ASteeringAgent::ASteeringAgent()
 void ASteeringAgent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetIsAutoOrienting(false);
 }
 
 void ASteeringAgent::BeginDestroy()
@@ -29,9 +31,14 @@ void ASteeringAgent::Tick(float DeltaTime)
 	if (SteeringBehavior)
 	{
 		SteeringOutput output = SteeringBehavior->CalculateSteering(DeltaTime, *this);
+
 		AddMovementInput(FVector{output.LinearVelocity, 0.f});
 
 		// TODO Implement angular velocity handling
+		
+		AddActorWorldRotation(
+			FRotator(0.f, output.AngularVelocity * DeltaTime, 0.f)
+		);
 	}
 }
 
