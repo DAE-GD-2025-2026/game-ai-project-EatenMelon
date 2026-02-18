@@ -150,7 +150,7 @@ SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 
 	const FVector forward = Agent.GetActorForwardVector();
 	Steering.LinearVelocity = FVector2D(forward.X, forward.Y);
-
+	
 	return Steering;
 }
 
