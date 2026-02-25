@@ -15,19 +15,35 @@ void ALevel_CombinedSteering::BeginPlay()
 {
 	Super::BeginPlay();
 
+	std::vector<BlendedSteering::WeightedBehavior> weightBehaviors{};
+
+	weightBehaviors.emplace_back(new Seek(), 0.5f);
+	weightBehaviors.emplace_back(new Wander(), 0.5f);
+
+	pBlendedSteering = new BlendedSteering(weightBehaviors);
+
+	auto agent = GetWorld()->SpawnActor<ASteeringAgent>
+		(
+			SteeringAgentClass,
+			FVector{ 0,0,90 },
+			FRotator::ZeroRotator
+		);
+
+	agent->SetSteeringBehavior(pBlendedSteering);
+
+	pAgents.push_back(agent);
 }
 
 void ALevel_CombinedSteering::BeginDestroy()
 {
 	Super::BeginDestroy();
-
 }
 
 // Called every frame
 void ALevel_CombinedSteering::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 #pragma region UI
 	//UI
 	{
@@ -67,7 +83,8 @@ void ALevel_CombinedSteering::Tick(float DeltaTime)
 	
 		if (ImGui::Checkbox("Debug Rendering", &CanDebugRender))
 		{
-   // TODO: Handle the debug rendering of your agents here :)
+			// TODO: Handle the debug rendering of your agents here :)
+			
 		}
 		ImGui::Checkbox("Trim World", &TrimWorld->bShouldTrimWorld);
 		if (TrimWorld->bShouldTrimWorld)
@@ -84,21 +101,44 @@ void ALevel_CombinedSteering::Tick(float DeltaTime)
 		ImGui::Text("Behavior Weights");
 		ImGui::Spacing();
 
-
-		// ImGuiHelpers::ImGuiSliderFloatWithSetter("Seek",
-		// 	pBlendedSteering->GetWeightedBehaviorsRef()[0].Weight, 0.f, 1.f,
-		// 	[this](float InVal) { pBlendedSteering->GetWeightedBehaviorsRef()[0].Weight = InVal; }, "%.2f");
-		//
-		// ImGuiHelpers::ImGuiSliderFloatWithSetter("Wander",
-		// pBlendedSteering->GetWeightedBehaviorsRef()[1].Weight, 0.f, 1.f,
-		// [this](float InVal) { pBlendedSteering->GetWeightedBehaviorsRef()[1].Weight = InVal; }, "%.2f");
+		 ImGuiHelpers::ImGuiSliderFloatWithSetter("Seek",
+		 	pBlendedSteering->GetWeightedBehaviorsRef()[0].Weight, 0.f, 1.f,
+		 	[this](float InVal) { pBlendedSteering->GetWeightedBehaviorsRef()[0].Weight = InVal; }, "%.2f");
+		
+		 ImGuiHelpers::ImGuiSliderFloatWithSetter("Wander",
+		 pBlendedSteering->GetWeightedBehaviorsRef()[1].Weight, 0.f, 1.f,
+		 [this](float InVal) { pBlendedSteering->GetWeightedBehaviorsRef()[1].Weight = InVal; }, "%.2f");
 	
 		//End
 		ImGui::End();
 	}
 #pragma endregion
-	
 	// Combined Steering Update
- // TODO: implement handling mouse click input for seek
- // TODO: implement Make sure to also evade the wanderer
+	// TODO: implement handling mouse click input for seek
+	// TODO: implement Make sure to also evade the wanderer
+	if (CanDebugRender)
+	{
+		for (auto& pAgent : pAgents)
+		{
+			DebugDraw(pAgent);
+		}
+	}
+
+}
+
+void ALevel_CombinedSteering::DebugDraw(const ASteeringAgent* pAgent)
+{
+	constexpr float shrink{ 3.f };						// the lines where to long
+
+	// colors
+	constexpr FColor LinearVelocityColor{ 255, 100, 100 };
+
+	DrawDebugDirectionalArrow
+	(
+		pAgent->GetWorld(),
+		FVector(pAgent->GetPosition(), 0.f),
+		FVector(pAgent->GetPosition() + pAgent->GetLinearVelocity(), 0.f),
+		1.f,
+		LinearVelocityColor
+	);
 }

@@ -92,5 +92,5 @@ protected:
 	float m_OffsetDistance{ 150.f };
 	float m_Radius{ 100.f };
 	float m_MaxAngleChange{ FMath::DegreesToRadians(30.f) };
-	float m_WanderAngle{ 0.f };
+	float m_WanderAngle{ 90.f };
 };

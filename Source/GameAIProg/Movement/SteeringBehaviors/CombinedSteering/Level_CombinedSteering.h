@@ -9,6 +9,7 @@
 #include "GameAIProg/Movement/SteeringBehaviors/SteeringAgent.h"
 #include "Level_CombinedSteering.generated.h"
 
+
 UCLASS()
 class GAMEAIPROG_API ALevel_CombinedSteering : public ALevel_Base
 {
@@ -28,9 +29,14 @@ protected:
 	virtual void BeginDestroy() override;
 
 private:
+
+	void DebugDraw(const ASteeringAgent* pAgent);
+
 	//Datamembers
 	bool UseMouseTarget = false;
-	bool CanDebugRender = false;
+	bool CanDebugRender = true;
 
-	
+	BlendedSteering* pBlendedSteering{ };
+
+	std::vector<ASteeringAgent*> pAgents{};
 };
