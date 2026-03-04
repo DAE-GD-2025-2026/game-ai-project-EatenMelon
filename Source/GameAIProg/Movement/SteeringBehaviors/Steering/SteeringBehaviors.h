@@ -26,6 +26,8 @@ public:
 	float GetSlowRadius() const;
 	float GetTargetRadius() const;
 
+	void SetTargetRadius(float radius) { TargetRadius = radius; }
+
 protected:
 	FTargetData Target;
 
