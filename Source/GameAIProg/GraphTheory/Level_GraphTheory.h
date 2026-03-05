@@ -37,6 +37,10 @@ private:
 	ASteeringAgent* Agent{nullptr}; // ref
 	PathFollow PathFollow{};
 	GameAI::Graph Graph{false};
+	
+	int LastNumNodes{ 0 };
+	int LastNumConnections{ 0 };
+
 	GameAI::GraphRenderer Renderer{nullptr};
 	GameAI::GraphNodeFactory<GameAI::Node> NodeFactory{};
 	

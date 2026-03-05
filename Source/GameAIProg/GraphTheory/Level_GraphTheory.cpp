@@ -102,8 +102,25 @@ void ALevel_GraphTheory::Tick(float DeltaTime)
 	Renderer.RenderGraph(Graph);
 	
 	// TODO Check if the graph has updated
+
+	int currentNumNodes = Graph.GetNodes().size();
+	int currentNumConnections = Graph.GetConnections().size();
+
+	if (currentNumConnections == LastNumConnections && currentNumNodes == LastNumNodes) return;
+	
+	LastNumConnections = currentNumConnections;
+	LastNumNodes = currentNumNodes;
+
 	// TODO if so, run the EulerianPath algorithm
+	auto eulerPath = EulerianPath(&Graph);
+
+	auto eulerianity = eulerPath.IsEulerian();
+
+	auto path = eulerPath.FindPath(eulerianity);
+
 	// TODO if a path is found, have the agent follow it
+	UpdateAgentPath(path);
+
 }
 
 void ALevel_GraphTheory::UpdateAgentPath(std::vector<Node*> const& Trail)
@@ -111,6 +128,10 @@ void ALevel_GraphTheory::UpdateAgentPath(std::vector<Node*> const& Trail)
 	std::vector<FVector2D> path{};
 	
 	// TODO convert Node vector to positions vector
+	for (Node* node : Trail)
+	{
+		path.emplace_back(node->GetPosition());
+	}
 
 	PathFollow.SetPath(path);
 	if (path.size() > 0)

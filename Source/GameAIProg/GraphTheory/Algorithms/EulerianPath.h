@@ -37,12 +37,12 @@ namespace GameAI
 		if (!IsConnected()) return Eulerianity::notEulerian;
 
 		// TODO Count nodes with odd degree
-		auto nodes = m_pGraph->GetNodes();
-		auto connection = m_pGraph->GetConnections();
+		auto nodes = &m_pGraph->GetNodes();
+		auto connection = &m_pGraph->GetConnections();
 
 		int numOddsNodes{ 0 };
 
-		for (int index = 0; index < nodes.size(); ++index)
+		for (int index = 0; index < nodes->size(); ++index)
 		{
 			if (m_pGraph->FindConnectionsFrom(index).size() % 2 == 0) continue;
 			
@@ -50,7 +50,7 @@ namespace GameAI
 		}
 
 		// TODO A connected graph with more than 2 nodes with an odd degree (an odd amount of connections) is not Eulerian
-		if (numOddsNodes < 2) return Eulerianity::notEulerian;
+		if (numOddsNodes > 2) return Eulerianity::notEulerian;
 
 		// TODO A connected graph with exactly 2 nodes with an odd degree is Semi-Eulerian (unless there are only 2 nodes)
 		if (numOddsNodes == 2) return Eulerianity::semiEulerian;
@@ -60,7 +60,7 @@ namespace GameAI
 		// does not need to be implented here
 
 		// TODO A connected graph with no odd nodes is Eulerian
-		if (numOddsNodes == 0) return Eulerianity::eulerian;
+		//if (numOddsNodes == 0) return Eulerianity::eulerian;
 
 		return Eulerianity::eulerian;
 	}
@@ -100,7 +100,7 @@ namespace GameAI
 
 		bool currentHasNeighbors = true;
 
-		while (currentHasNeighbors && !nodeStack.empty())
+		while (currentHasNeighbors || !nodeStack.empty())
 		{
 			auto connections = graphCopy.FindConnectionsFrom(currentNodeId);
 
@@ -108,13 +108,15 @@ namespace GameAI
 
 			if (currentHasNeighbors)
 			{
-				int newId = connections[0]->GetToId();
+				nodeStack.push(currentNodeId);
+
+				currentNodeId = connections[0]->GetToId();
 
 				graphCopy.RemoveConnection(connections[0]);
-
-				currentNodeId = newId;
-
-
+			}
+			else
+			{
+				nodeStack.pop();
 			}
 		}
 
